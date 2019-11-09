@@ -12,8 +12,8 @@ type
   LevelDbException* = object of Exception
 
 const
-  levelDbTrue = cuchar(1)
-  levelDbFalse = cuchar(0)
+  levelDbTrue = uint8(1)
+  levelDbFalse = uint8(0)
 
 proc checkError(errPtr: cstring) =
   if errPtr != nil:
@@ -45,6 +45,10 @@ proc open*(path: string): LevelDb =
   var errPtr: cstring = nil
   result.db = leveldb_open(options, path, addr errPtr)
   checkError(errPtr)
+
+proc version*(self: LevelDb): (int, int) =
+  result[0] = leveldb_major_version()
+  result[1] = leveldb_minor_version()
 
 proc put*(self: LevelDb, key: string, value: string, sync = true) =
   assert self.db != nil
@@ -116,30 +120,54 @@ iterator iter*(self: LevelDb, seek: string = "", reverse: bool = false): (
     else:
       leveldb_iter_next(iterPtr)
 
+proc removeDb*(name: string) =
+  var err: cstring = nil
+  let options = leveldb_options_create()
+  leveldb_destroy_db(options, name, addr err)
+  checkError(err)
+
 when isMainModule:
-  let db = leveldb.open("test.db")
-  db.put("hello", "world")
-  echo db.get("nothing")
-  echo db.get("hello")
-  db.delete("hello")
-  echo db.get("hello")
+  import sequtils
 
-  db.put("aaa", "1")
-  db.put("aba", "2")
-  db.put("abb", "3")
+  let env = leveldb_create_default_env()
+  let dbName = $(leveldb_env_get_test_directory(env))
+  let db = leveldb.open(dbName)
 
-  echo ">> iter"
-  for i in db.iter:
-    echo i
+  block version:
+    let (major, minor) = db.version()
+    doAssert major > 0
+    doAssert minor > 0
 
-  echo ">> iter reverse"
-  for i in db.iter(reverse = true):
-    echo i
+  block getPutDelete:
+    doAssert db.get("hello") == none(string)
+    db.put("hello", "world")
+    doAssert db.get("hello") == some("world")
+    db.delete("hello")
+    doAssert db.get("hello") == none(string)
 
-  echo ">> iter seek ab"
-  for i in db.iter(seek = "ab"):
-    echo i
+  block iter:
+    db.put("aa", "1")
+    db.put("ba", "2")
+    db.put("bb", "3")
 
-  echo ">> iter seek ab reverse"
-  for i in db.iter(seek = "ab", reverse = true):
-    echo i
+    block iterNormal:
+      doAssert toSeq(db.iter()) ==
+               @[("aa", "1"), ("ba", "2"), ("bb", "3")]
+
+    block iterReverse:
+      doAssert toSeq(db.iter(reverse = true)) ==
+               @[("bb", "3"), ("ba", "2"), ("aa", "1")]
+
+    block iterSeek:
+      doAssert toSeq(db.iter(seek = "ab")) ==
+               @[("ba", "2"), ("bb", "3")]
+
+    block iterSeekReverse:
+      doAssert toSeq(db.iter(seek = "ab", reverse = true)) ==
+               @[("ba", "2"), ("aa", "1")]
+
+  block close:
+    db.close()
+
+  block remove:
+    removeDb(dbName)

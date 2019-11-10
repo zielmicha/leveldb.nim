@@ -13,7 +13,7 @@ suite "leveldb":
     removeDb(dbName)
 
   test "version":
-    let (major, minor) = db.version()
+    let (major, minor) = getLibVersion()
     check(major > 0)
     check(minor > 0)
 

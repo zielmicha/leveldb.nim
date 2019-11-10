@@ -1,7 +1,5 @@
 import options, leveldb/raw
 
-proc free(p: pointer) {.importc.}
-
 type
   LevelDb* = ref object
     db: ptr leveldb_t
@@ -14,6 +12,8 @@ type
 const
   levelDbTrue = uint8(1)
   levelDbFalse = uint8(0)
+
+proc free(p: pointer) {.importc.}
 
 proc checkError(errPtr: cstring) =
   if errPtr != nil:
@@ -127,47 +127,4 @@ proc removeDb*(name: string) =
   checkError(err)
 
 when isMainModule:
-  import sequtils
-
-  let env = leveldb_create_default_env()
-  let dbName = $(leveldb_env_get_test_directory(env))
-  let db = leveldb.open(dbName)
-
-  block version:
-    let (major, minor) = db.version()
-    doAssert major > 0
-    doAssert minor > 0
-
-  block getPutDelete:
-    doAssert db.get("hello") == none(string)
-    db.put("hello", "world")
-    doAssert db.get("hello") == some("world")
-    db.delete("hello")
-    doAssert db.get("hello") == none(string)
-
-  block iter:
-    db.put("aa", "1")
-    db.put("ba", "2")
-    db.put("bb", "3")
-
-    block iterNormal:
-      doAssert toSeq(db.iter()) ==
-               @[("aa", "1"), ("ba", "2"), ("bb", "3")]
-
-    block iterReverse:
-      doAssert toSeq(db.iter(reverse = true)) ==
-               @[("bb", "3"), ("ba", "2"), ("aa", "1")]
-
-    block iterSeek:
-      doAssert toSeq(db.iter(seek = "ab")) ==
-               @[("ba", "2"), ("bb", "3")]
-
-    block iterSeekReverse:
-      doAssert toSeq(db.iter(seek = "ab", reverse = true)) ==
-               @[("ba", "2"), ("aa", "1")]
-
-  block close:
-    db.close()
-
-  block remove:
-    removeDb(dbName)
+  discard

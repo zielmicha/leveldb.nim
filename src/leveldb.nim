@@ -126,6 +126,8 @@ iterator iterPrefix*(self: LevelDb, prefix: string): (string, string) =
   for (key, value) in iter(self, prefix, reverse = false):
     if key.startsWith(prefix):
       yield (key, value)
+    else:
+      break
 
 iterator iterRange*(self: LevelDb, start, limit: string): (string, string) =
   let reverse: bool = limit < start

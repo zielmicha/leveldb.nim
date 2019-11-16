@@ -57,3 +57,13 @@ suite "leveldb":
     initData(db)
     check(toSeq(db.iterPrefix(prefix = "b")) ==
           @[("ba", "2"), ("bb", "3")])
+
+  test "iter range":
+    initData(db)
+    check(toSeq(db.iterRange(start = "a", limit = "ba")) ==
+          @[("aa", "1"), ("ba", "2")])
+
+  test "iter range reverse":
+    initData(db)
+    check(toSeq(db.iterRange(start = "bb", limit = "b")) ==
+          @[("bb", "3"), ("ba", "2")])

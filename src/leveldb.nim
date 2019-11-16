@@ -122,10 +122,21 @@ iterator iter*(self: LevelDb, seek: string = "", reverse: bool = false): (
     else:
       leveldb_iter_next(iterPtr)
 
-iterator iterPrefix*(self: LevelDb, prefix: string = ""): (string, string) =
-  for (key, value) in iter(self, prefix):
+iterator iterPrefix*(self: LevelDb, prefix: string): (string, string) =
+  for (key, value) in iter(self, prefix, reverse = false):
     if key.startsWith(prefix):
       yield (key, value)
+
+iterator iterRange*(self: LevelDb, start, limit: string): (string, string) =
+  let reverse: bool = limit < start
+  for (key, value) in iter(self, start, reverse = reverse):
+    if reverse:
+      if key < limit:
+        break
+    else:
+      if key > limit:
+        break
+    yield (key, value)
 
 proc removeDb*(name: string) =
   var err: cstring = nil

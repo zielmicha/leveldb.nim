@@ -1,4 +1,4 @@
-import options, leveldb/raw
+import options, strutils, leveldb/raw
 
 type
   LevelDb* = ref object
@@ -121,6 +121,11 @@ iterator iter*(self: LevelDb, seek: string = "", reverse: bool = false): (
       leveldb_iter_prev(iterPtr)
     else:
       leveldb_iter_next(iterPtr)
+
+iterator iterPrefix*(self: LevelDb, prefix: string = ""): (string, string) =
+  for (key, value) in iter(self, prefix):
+    if key.startsWith(prefix):
+      yield (key, value)
 
 proc removeDb*(name: string) =
   var err: cstring = nil

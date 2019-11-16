@@ -52,3 +52,8 @@ suite "leveldb":
     initData(db)
     check(toSeq(db.iter(seek = "ab", reverse = true)) ==
           @[("ba", "2"), ("aa", "1")])
+
+  test "iter prefix":
+    initData(db)
+    check(toSeq(db.iterPrefix(prefix = "b")) ==
+          @[("ba", "2"), ("bb", "3")])

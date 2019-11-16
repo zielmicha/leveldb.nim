@@ -13,7 +13,7 @@ const
   levelDbTrue = uint8(1)
   levelDbFalse = uint8(0)
 
-  version = "0.3.0"
+  version* = "0.3.0"
 
 proc free(p: pointer) {.importc.}
 

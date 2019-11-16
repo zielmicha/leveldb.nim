@@ -29,6 +29,10 @@ suite "leveldb":
     db.delete("hello")
     check(db.get("hello") == none(string))
 
+  test "get value with 0x00":
+    db.put("\0key", "\0ff")
+    check(db.get("\0key") == some("\0ff"))
+
   proc initData(db: LevelDb) =
     db.put("aa", "1")
     db.put("ba", "2")
@@ -67,3 +71,8 @@ suite "leveldb":
     initData(db)
     check(toSeq(db.iterRange(start = "bb", limit = "b")) ==
           @[("bb", "3"), ("ba", "2")])
+
+  test "iter with 0x00":
+    db.put("\0z1", "\0ff")
+    db.put("z2\0", "ff\0")
+    check(toSeq(db.iter()) == @[("\0z1", "\0ff"), ("z2\0", "ff\0")])

@@ -60,6 +60,10 @@ proc put*(self: LevelDb, key: string, value: string, sync = true) =
               key, key.len.csize, value, value.len.csize, addr errPtr)
   checkError(errPtr)
 
+proc newString(cstr: cstring, length: csize): string =
+  result = newString(length)
+  copyMem(unsafeAddr result[0], cstr, length)
+
 proc get*(self: LevelDb, key: string): Option[string] =
   var size: csize
   var errPtr: cstring = nil
@@ -69,7 +73,7 @@ proc get*(self: LevelDb, key: string): Option[string] =
   if s == nil:
     result = none(string)
   else:
-    result = some ($s)[0..<size]
+    result = some (newString(s, size))
     free(s)
 
 proc delete*(self: LevelDb, key: string, sync = true) =
@@ -84,13 +88,13 @@ proc getIterData(iterPtr: ptr leveldb_iterator_t): (Option[string], Option[strin
 
   str = leveldb_iter_key(iterPtr, addr len)
   if len > 0:
-    result[0] = some ($str)[0..<len]
+    result[0] = some (newString(str, len))
   else:
     result[0] = none string
 
   str = leveldb_iter_value(iterPtr, addr len)
   if len > 0:
-    result[1] = some ($str)[0..<len]
+    result[1] = some (newString(str, len))
   else:
     result[1] = none string
 

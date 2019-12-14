@@ -103,8 +103,11 @@ proc put*(self: LevelDb, key: string, value: string, sync = true) =
   checkError(errPtr)
 
 proc newString(cstr: cstring, length: csize): string =
-  result = newString(length)
-  copyMem(unsafeAddr result[0], cstr, length)
+  if length > 0:
+    result = newString(length)
+    copyMem(unsafeAddr result[0], cstr, length)
+  else:
+    result = ""
 
 proc get*(self: LevelDb, key: string): Option[string] =
   var size: csize
@@ -115,7 +118,7 @@ proc get*(self: LevelDb, key: string): Option[string] =
   if s == nil:
     result = none(string)
   else:
-    result = some (newString(s, size))
+    result = some(newString(s, size))
     free(s)
 
 proc delete*(self: LevelDb, key: string, sync = true) =
@@ -151,21 +154,15 @@ proc write*(self: LevelDb, batch: LevelDbBatch) =
   leveldb_write(self.db, self.syncWriteOptions, batch.batch, addr errPtr)
   checkError(errPtr)
 
-proc getIterData(iterPtr: ptr leveldb_iterator_t): (Option[string], Option[string]) =
+proc getIterData(iterPtr: ptr leveldb_iterator_t): (string, string) =
   var len: csize
   var str: cstring
 
   str = leveldb_iter_key(iterPtr, addr len)
-  if len > 0:
-    result[0] = some (newString(str, len))
-  else:
-    result[0] = none string
+  result[0] = newString(str, len)
 
   str = leveldb_iter_value(iterPtr, addr len)
-  if len > 0:
-    result[1] = some (newString(str, len))
-  else:
-    result[1] = none string
+  result[1] = newString(str, len)
 
 iterator iter*(self: LevelDb, seek: string = "", reverse: bool = false): (
     string, string) =
@@ -188,7 +185,7 @@ iterator iter*(self: LevelDb, seek: string = "", reverse: bool = false): (
     var err: cstring = nil
     leveldb_iter_get_error(iterPtr, addr err)
     checkError(err)
-    yield (key.get(), value.get())
+    yield (key, value)
 
     if reverse:
       leveldb_iter_prev(iterPtr)

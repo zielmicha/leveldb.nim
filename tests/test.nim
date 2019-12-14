@@ -104,3 +104,8 @@ suite "leveldb":
     batch.put("b", "2")
     db.write(batch)
     check(toSeq(db.iter()) == @[("b", "2")])
+
+  test "open with cache":
+    let ldb = leveldb.open(dbName & "-cache", cacheCapacity = 100000)
+    ldb.put("a", "1")
+    check(toSeq(ldb.iter()) == @[("a", "1")])

@@ -6,6 +6,7 @@ type
     syncWriteOptions: ptr leveldb_writeoptions_t
     asyncWriteOptions: ptr leveldb_writeoptions_t
     readOptions: ptr leveldb_readoptions_t
+    cache: ptr leveldb_cache_t
 
   LevelDbBatch* = ref object
     batch: ptr leveldb_writebatch_t
@@ -36,9 +37,12 @@ proc close*(self: LevelDb) =
   leveldb_writeoptions_destroy(self.syncWriteOptions)
   leveldb_writeoptions_destroy(self.asyncWriteOptions)
   leveldb_readoptions_destroy(self.readOptions)
+  if self.cache != nil:
+    leveldb_cache_destroy(self.cache)
+    self.cache = nil
   self.db = nil
 
-proc open*(path: string): LevelDb =
+proc open*(path: string, cacheCapacity = 0): LevelDb =
   new(result, close)
 
   let options = leveldb_options_create()
@@ -50,6 +54,11 @@ proc open*(path: string): LevelDb =
   result.asyncWriteOptions = leveldb_writeoptions_create()
   leveldb_writeoptions_set_sync(result.asyncWriteOptions, levelDbFalse)
   result.readOptions = leveldb_readoptions_create()
+
+  if cacheCapacity > 0:
+    let cache = leveldb_cache_create_lru(cacheCapacity)
+    leveldb_options_set_cache(options, cache)
+    result.cache = cache
 
   var errPtr: cstring = nil
   result.db = leveldb_open(options, path, addr errPtr)

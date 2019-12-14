@@ -76,3 +76,31 @@ suite "leveldb":
     db.put("\0z1", "\0ff")
     db.put("z2\0", "ff\0")
     check(toSeq(db.iter()) == @[("\0z1", "\0ff"), ("z2\0", "ff\0")])
+
+  test "batch":
+    db.put("a", "1")
+    db.put("b", "2")
+    let batch = newBatch()
+    batch.put("a", "10")
+    batch.put("c", "30")
+    batch.delete("b")
+    db.write(batch)
+    check(toSeq(db.iter()) == @[("a", "10"), ("c", "30")])
+
+  test "batch append":
+    let batch = newBatch()
+    let batch2 = newBatch()
+    batch.put("a", "1")
+    batch2.put("b", "2")
+    batch2.delete("a")
+    batch.append(batch2)
+    db.write(batch)
+    check(toSeq(db.iter()) == @[("b", "2")])
+
+  test "batch clear":
+    let batch = newBatch()
+    batch.put("a", "1")
+    batch.clear()
+    batch.put("b", "2")
+    db.write(batch)
+    check(toSeq(db.iter()) == @[("b", "2")])

@@ -7,6 +7,9 @@ type
     asyncWriteOptions: ptr leveldb_writeoptions_t
     readOptions: ptr leveldb_readoptions_t
 
+  LevelDbBatch* = ref object
+    batch: ptr leveldb_writebatch_t
+
   LevelDbException* = object of Exception
 
 const
@@ -80,6 +83,33 @@ proc delete*(self: LevelDb, key: string, sync = true) =
   var errPtr: cstring = nil
   let writeOptions = if sync: self.syncWriteOptions else: self.asyncWriteOptions
   leveldb_delete(self.db, writeOptions, key, key.len, addr errPtr)
+  checkError(errPtr)
+
+proc destroy*(self: LevelDbBatch) =
+  if self.batch == nil:
+    return
+  leveldb_writebatch_destroy(self.batch)
+  self.batch = nil
+
+proc newBatch*(): LevelDbBatch =
+  new(result, destroy)
+  result.batch = leveldb_writebatch_create()
+
+proc put*(self: LevelDbBatch, key: string, value: string, sync = true) =
+  leveldb_writebatch_put(self.batch, key, key.len.csize, value, value.len.csize)
+
+proc append*(self, source: LevelDbBatch) =
+  leveldb_writebatch_append(self.batch, source.batch)
+
+proc delete*(self: LevelDbBatch, key: string) =
+  leveldb_writebatch_delete(self.batch, key, key.len.csize)
+
+proc clear*(self: LevelDbBatch) =
+  leveldb_writebatch_clear(self.batch)
+
+proc write*(self: LevelDb, batch: LevelDbBatch) =
+  var errPtr: cstring = nil
+  leveldb_write(self.db, self.syncWriteOptions, batch.batch, addr errPtr)
   checkError(errPtr)
 
 proc getIterData(iterPtr: ptr leveldb_iterator_t): (Option[string], Option[string]) =

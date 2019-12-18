@@ -1,4 +1,4 @@
-import options, strutils, leveldb/raw
+import options, strutils, leveldbpkg/raw
 
 type
   LevelDb* = ref object

@@ -5,6 +5,8 @@ author        = "Michał Zieliński"
 description   = "LevelDB wrapper for Nim"
 license       = "MIT"
 srcDir        = "src"
+installExt    = @["nim"]
+skipDirs      = @["tests"]
 binDir        = "bin"
 bin           = @["leveldb"]
 

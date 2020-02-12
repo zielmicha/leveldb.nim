@@ -77,6 +77,11 @@ suite "leveldb":
     db.put("z2\0", "ff\0")
     check(toSeq(db.iter()) == @[("\0z1", "\0ff"), ("z2\0", "ff\0")])
 
+  test "repair database":
+    initData(db)
+    db.close()
+    repairDb(dbName)
+
   test "batch":
     db.put("a", "1")
     db.put("b", "2")
@@ -107,5 +112,8 @@ suite "leveldb":
 
   test "open with cache":
     let ldb = leveldb.open(dbName & "-cache", cacheCapacity = 100000)
+    defer:
+      ldb.close()
+      removeDb(ldb.path)
     ldb.put("a", "1")
     check(toSeq(ldb.iter()) == @[("a", "1")])

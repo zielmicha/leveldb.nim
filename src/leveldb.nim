@@ -2,6 +2,7 @@ import options, strutils, leveldb/raw
 
 type
   LevelDb* = ref object
+    path*: string
     db: ptr leveldb_t
     syncWriteOptions: ptr leveldb_writeoptions_t
     asyncWriteOptions: ptr leveldb_writeoptions_t
@@ -61,6 +62,7 @@ proc open*(path: string, cacheCapacity = 0): LevelDb =
     result.cache = cache
 
   var errPtr: cstring = nil
+  result.path = path
   result.db = leveldb_open(options, path, addr errPtr)
   checkError(errPtr)
 
@@ -189,7 +191,7 @@ proc removeDb*(name: string) =
   leveldb_destroy_db(options, name, addr err)
   checkError(err)
 
-proc repaireDb*(name: string) =
+proc repairDb*(name: string) =
   let options = leveldb_options_create()
   leveldb_options_set_create_if_missing(options, 0)
   leveldb_options_set_error_if_exists(options, 0)
@@ -322,4 +324,4 @@ when isMainModule:
     db.delete(key)
     db.close()
   elif args[0] == "repair":
-    repaireDb(dbPath)
+    repairDb(dbPath)

@@ -117,3 +117,22 @@ suite "leveldb":
       removeDb(ldb.path)
     ldb.put("a", "1")
     check(toSeq(ldb.iter()) == @[("a", "1")])
+
+  test "open but no create":
+    expect LevelDbException:
+      let failed = leveldb.open(dbName & "-nocreate", create = false)
+      defer:
+        failed.close()
+        removeDb(failed.path)
+
+  test "open but no reuse":
+    let old = leveldb.open(dbName & "-noreuse", reuse = true)
+    defer:
+      old.close()
+      removeDb(old.path)
+
+    expect LevelDbException:
+      let failed = leveldb.open(old.path, reuse = false)
+      defer:
+        failed.close()
+        removeDb(failed.path)

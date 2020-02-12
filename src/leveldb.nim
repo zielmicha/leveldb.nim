@@ -43,11 +43,13 @@ proc close*(self: LevelDb) =
     self.cache = nil
   self.db = nil
 
-proc open*(path: string, cacheCapacity = 0): LevelDb =
+proc open*(path: string, create = true, reuse = true, paranoidChecks = true,
+    cacheCapacity = 0, blockSize = 4 * 1024, writeBufferSize = 4*1024*1024,
+    maxOpenFiles = 1000, maxFileSize = 2 * 1024 * 1024,
+    restartInterval = 16): LevelDb =
   new(result, close)
 
   let options = leveldb_options_create()
-  leveldb_options_set_create_if_missing(options, levelDbTrue)
   defer: leveldb_options_destroy(options)
 
   result.syncWriteOptions = leveldb_writeoptions_create()
@@ -55,6 +57,26 @@ proc open*(path: string, cacheCapacity = 0): LevelDb =
   result.asyncWriteOptions = leveldb_writeoptions_create()
   leveldb_writeoptions_set_sync(result.asyncWriteOptions, levelDbFalse)
   result.readOptions = leveldb_readoptions_create()
+
+  if create:
+    leveldb_options_set_create_if_missing(options, levelDbTrue)
+  else:
+    leveldb_options_set_create_if_missing(options, levelDbFalse)
+  if reuse:
+    leveldb_options_set_error_if_exists(options, levelDbFalse)
+  else:
+    leveldb_options_set_error_if_exists(options, levelDbTrue)
+  if paranoidChecks:
+    leveldb_options_set_paranoid_checks(options, levelDbTrue)
+  else:
+    leveldb_options_set_paranoid_checks(options, levelDbFalse)
+
+  leveldb_options_set_write_buffer_size(options, writeBufferSize)
+  leveldb_options_set_block_size(options, blockSize)
+  leveldb_options_set_max_open_files(options, cast[cint](maxOpenFiles))
+  leveldb_options_set_max_file_size(options, maxFileSize)
+  leveldb_options_set_block_restart_interval(options,
+                                             cast[cint](restartInterval))
 
   if cacheCapacity > 0:
     let cache = leveldb_cache_create_lru(cacheCapacity)
@@ -193,8 +215,8 @@ proc removeDb*(name: string) =
 
 proc repairDb*(name: string) =
   let options = leveldb_options_create()
-  leveldb_options_set_create_if_missing(options, 0)
-  leveldb_options_set_error_if_exists(options, 0)
+  leveldb_options_set_create_if_missing(options, levelDbFalse)
+  leveldb_options_set_error_if_exists(options, levelDbFalse)
   var errPtr: cstring = nil
   leveldb_repair_db(options, name, addr errPtr)
   checkError(errPtr)

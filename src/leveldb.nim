@@ -12,6 +12,10 @@ type
   LevelDbBatch* = ref object
     batch: ptr leveldb_writebatch_t
 
+  CompressionType* = enum
+    ctNoCompression = leveldb_no_compression,
+    ctSnappyCompression = leveldb_snappy_compression
+
   LevelDbException* = object of Exception
 
 const
@@ -44,9 +48,10 @@ proc close*(self: LevelDb) =
   self.db = nil
 
 proc open*(path: string, create = true, reuse = true, paranoidChecks = true,
+    compressionType = ctSnappyCompression,
     cacheCapacity = 0, blockSize = 4 * 1024, writeBufferSize = 4*1024*1024,
     maxOpenFiles = 1000, maxFileSize = 2 * 1024 * 1024,
-    restartInterval = 16): LevelDb =
+    blockRestartInterval = 16): LevelDb =
   new(result, close)
 
   let options = leveldb_options_create()
@@ -76,7 +81,8 @@ proc open*(path: string, create = true, reuse = true, paranoidChecks = true,
   leveldb_options_set_max_open_files(options, cast[cint](maxOpenFiles))
   leveldb_options_set_max_file_size(options, maxFileSize)
   leveldb_options_set_block_restart_interval(options,
-                                             cast[cint](restartInterval))
+                                             cast[cint](blockRestartInterval))
+  leveldb_options_set_compression(options, cast[cint](compressionType.ord))
 
   if cacheCapacity > 0:
     let cache = leveldb_cache_create_lru(cacheCapacity)

@@ -136,3 +136,10 @@ suite "leveldb":
       defer:
         failed.close()
         removeDb(failed.path)
+
+  test "no compress":
+    db.close()
+    let nc = leveldb.open(dbName, compressionType = ctNoCompression)
+    defer: nc.close()
+    nc.put("a", "1")
+    check(toSeq(nc.iter()) == @[("a", "1")])

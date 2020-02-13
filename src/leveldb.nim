@@ -2,6 +2,7 @@ import options, strutils, leveldb/raw
 
 type
   LevelDb* = ref object
+    path*: string
     db: ptr leveldb_t
     syncWriteOptions: ptr leveldb_writeoptions_t
     asyncWriteOptions: ptr leveldb_writeoptions_t
@@ -10,6 +11,10 @@ type
 
   LevelDbBatch* = ref object
     batch: ptr leveldb_writebatch_t
+
+  CompressionType* = enum
+    ctNoCompression = leveldb_no_compression,
+    ctSnappyCompression = leveldb_snappy_compression
 
   LevelDbException* = object of Exception
 
@@ -42,11 +47,14 @@ proc close*(self: LevelDb) =
     self.cache = nil
   self.db = nil
 
-proc open*(path: string, cacheCapacity = 0): LevelDb =
+proc open*(path: string, create = true, reuse = true, paranoidChecks = true,
+    compressionType = ctSnappyCompression,
+    cacheCapacity = 0, blockSize = 4 * 1024, writeBufferSize = 4*1024*1024,
+    maxOpenFiles = 1000, maxFileSize = 2 * 1024 * 1024,
+    blockRestartInterval = 16): LevelDb =
   new(result, close)
 
   let options = leveldb_options_create()
-  leveldb_options_set_create_if_missing(options, levelDbTrue)
   defer: leveldb_options_destroy(options)
 
   result.syncWriteOptions = leveldb_writeoptions_create()
@@ -55,12 +63,34 @@ proc open*(path: string, cacheCapacity = 0): LevelDb =
   leveldb_writeoptions_set_sync(result.asyncWriteOptions, levelDbFalse)
   result.readOptions = leveldb_readoptions_create()
 
+  if create:
+    leveldb_options_set_create_if_missing(options, levelDbTrue)
+  else:
+    leveldb_options_set_create_if_missing(options, levelDbFalse)
+  if reuse:
+    leveldb_options_set_error_if_exists(options, levelDbFalse)
+  else:
+    leveldb_options_set_error_if_exists(options, levelDbTrue)
+  if paranoidChecks:
+    leveldb_options_set_paranoid_checks(options, levelDbTrue)
+  else:
+    leveldb_options_set_paranoid_checks(options, levelDbFalse)
+
+  leveldb_options_set_write_buffer_size(options, writeBufferSize)
+  leveldb_options_set_block_size(options, blockSize)
+  leveldb_options_set_max_open_files(options, cast[cint](maxOpenFiles))
+  leveldb_options_set_max_file_size(options, maxFileSize)
+  leveldb_options_set_block_restart_interval(options,
+                                             cast[cint](blockRestartInterval))
+  leveldb_options_set_compression(options, cast[cint](compressionType.ord))
+
   if cacheCapacity > 0:
     let cache = leveldb_cache_create_lru(cacheCapacity)
     leveldb_options_set_cache(options, cache)
     result.cache = cache
 
   var errPtr: cstring = nil
+  result.path = path
   result.db = leveldb_open(options, path, addr errPtr)
   checkError(errPtr)
 
@@ -189,10 +219,10 @@ proc removeDb*(name: string) =
   leveldb_destroy_db(options, name, addr err)
   checkError(err)
 
-proc repaireDb*(name: string) =
+proc repairDb*(name: string) =
   let options = leveldb_options_create()
-  leveldb_options_set_create_if_missing(options, 0)
-  leveldb_options_set_error_if_exists(options, 0)
+  leveldb_options_set_create_if_missing(options, levelDbFalse)
+  leveldb_options_set_error_if_exists(options, levelDbFalse)
   var errPtr: cstring = nil
   leveldb_repair_db(options, name, addr errPtr)
   checkError(errPtr)
@@ -322,4 +352,4 @@ when isMainModule:
     db.delete(key)
     db.close()
   elif args[0] == "repair":
-    repaireDb(dbPath)
+    repairDb(dbPath)

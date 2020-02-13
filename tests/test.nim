@@ -77,6 +77,11 @@ suite "leveldb":
     db.put("z2\0", "ff\0")
     check(toSeq(db.iter()) == @[("\0z1", "\0ff"), ("z2\0", "ff\0")])
 
+  test "repair database":
+    initData(db)
+    db.close()
+    repairDb(dbName)
+
   test "batch":
     db.put("a", "1")
     db.put("b", "2")
@@ -107,5 +112,34 @@ suite "leveldb":
 
   test "open with cache":
     let ldb = leveldb.open(dbName & "-cache", cacheCapacity = 100000)
+    defer:
+      ldb.close()
+      removeDb(ldb.path)
     ldb.put("a", "1")
     check(toSeq(ldb.iter()) == @[("a", "1")])
+
+  test "open but no create":
+    expect LevelDbException:
+      let failed = leveldb.open(dbName & "-nocreate", create = false)
+      defer:
+        failed.close()
+        removeDb(failed.path)
+
+  test "open but no reuse":
+    let old = leveldb.open(dbName & "-noreuse", reuse = true)
+    defer:
+      old.close()
+      removeDb(old.path)
+
+    expect LevelDbException:
+      let failed = leveldb.open(old.path, reuse = false)
+      defer:
+        failed.close()
+        removeDb(failed.path)
+
+  test "no compress":
+    db.close()
+    let nc = leveldb.open(dbName, compressionType = ctNoCompression)
+    defer: nc.close()
+    nc.put("a", "1")
+    check(toSeq(nc.iter()) == @[("a", "1")])

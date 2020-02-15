@@ -33,6 +33,14 @@ suite "leveldb":
     db.put("\0key", "\0ff")
     check(db.get("\0key") == some("\0ff"))
 
+  test "get empty value":
+    db.put("a", "")
+    check(db.get("a") == some(""))
+
+  test "get empty key":
+    db.put("", "a")
+    check(db.get("") == some("a"))
+
   proc initData(db: LevelDb) =
     db.put("aa", "1")
     db.put("ba", "2")
@@ -76,6 +84,14 @@ suite "leveldb":
     db.put("\0z1", "\0ff")
     db.put("z2\0", "ff\0")
     check(toSeq(db.iter()) == @[("\0z1", "\0ff"), ("z2\0", "ff\0")])
+
+  test "iter empty value":
+    db.put("a", "")
+    check(toSeq(db.iter()) == @[("a", "")])
+
+  test "iter empty key":
+    db.put("", "a")
+    check(toSeq(db.iter()) == @[("", "a")])
 
   test "repair database":
     initData(db)

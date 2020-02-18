@@ -1,4 +1,4 @@
-import options, strutils, leveldb/raw
+import options, strutils, leveldbpkg/raw
 
 type
   LevelDb* = ref object
@@ -193,7 +193,7 @@ iterator iter*(self: LevelDb, seek: string = "", reverse: bool = false): (
       leveldb_iter_next(iterPtr)
 
 iterator iterPrefix*(self: LevelDb, prefix: string): (string, string) =
-  for (key, value) in iter(self, prefix, reverse = false):
+  for key, value in iter(self, prefix, reverse = false):
     if key.startsWith(prefix):
       yield (key, value)
     else:
@@ -201,7 +201,7 @@ iterator iterPrefix*(self: LevelDb, prefix: string): (string, string) =
 
 iterator iterRange*(self: LevelDb, start, limit: string): (string, string) =
   let reverse: bool = limit < start
-  for (key, value) in iter(self, start, reverse = reverse):
+  for key, value in iter(self, start, reverse = reverse):
     if reverse:
       if key < limit:
         break
@@ -331,7 +331,7 @@ when isMainModule:
     db.close()
   elif args[0] == "list":
     db = open(dbPath)
-    for (key, value) in db.iter():
+    for key, value in db.iter():
       if hex:
         echo key, " ", value.toHex()
       else:
@@ -339,7 +339,7 @@ when isMainModule:
     db.close()
   elif args[0] == "keys":
     db = open(dbPath)
-    for (key, value) in db.iter():
+    for key, value in db.iter():
       echo key
     db.close()
   elif args[0] == "delete":

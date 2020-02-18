@@ -1,5 +1,5 @@
 import unittest, options, sequtils
-import leveldb, leveldb/raw
+import leveldb, leveldbpkg/raw
 
 suite "leveldb":
 

@@ -19,10 +19,18 @@ type
   LevelDbException* = object of Exception
 
 const
+  version* = block:
+    let content = staticRead"../leveldb.nimble"
+    var version_line: string
+    for line in content.split("\L"):
+      if line.startsWith("version"):
+        version_line = line
+        break
+    let raw = version_line.split("=", maxsplit = 1)[1]
+    raw.strip().strip(chars = {'"'})
+
   levelDbTrue = uint8(1)
   levelDbFalse = uint8(0)
-
-  version* = "0.3.0"
 
 proc free(p: pointer) {.importc.}
 

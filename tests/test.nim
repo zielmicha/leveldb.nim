@@ -1,5 +1,27 @@
-import unittest, options, sequtils
+import unittest, options, os, osproc, sequtils, strutils, sugar
 import leveldb, leveldbpkg/raw
+
+template cd*(dir: string, body: untyped) =
+  ## Sets the current dir to ``dir``, executes ``body`` and restores the
+  ## previous working dir.
+  block:
+    let lastDir = getCurrentDir()
+    setCurrentDir(dir)
+    body
+    setCurrentDir(lastDir)
+
+proc execNimble(args: varargs[string]): tuple[output: string, exitCode: int] =
+  const tmpNimbleDir = "/tmp/testnimble"
+  var quotedArgs = @args
+  quotedArgs.insert("-y")
+  quotedArgs.insert("--nimbleDir:" & tmpNimbleDir)
+  quotedArgs.insert("nimble")
+  quotedArgs = quotedArgs.map((x: string) => ("\"" & x & "\""))
+
+  let cmd = quotedArgs.join(" ")
+  result = execCmdEx(cmd)
+  checkpoint(cmd)
+  checkpoint(result.output)
 
 suite "leveldb":
 
@@ -159,3 +181,20 @@ suite "leveldb":
     defer: nc.close()
     nc.put("a", "1")
     check(toSeq(nc.iter()) == @[("a", "1")])
+
+suite "package":
+
+  test "import as package":
+    let (output, exitCode) = execNimble("install")
+    check exitCode == QuitSuccess
+    check output.contains("leveldb installed successfully.")
+
+    cd "tests/packagetest":
+      var (output, exitCode) = execNimble("build")
+      check exitCode == QuitSuccess
+      check output.contains("Building")
+
+      (output, exitCode) = execCmdEx("./packagetest")
+      checkpoint output
+      check exitCode == QuitSuccess
+      check output.contains("leveldb works.")

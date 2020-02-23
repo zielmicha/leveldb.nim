@@ -1,4 +1,4 @@
-import unittest, options, os, osproc, sequtils, strutils, sugar
+import unittest, options, os, osproc, sequtils, strutils
 import leveldb, leveldbpkg/raw
 
 const
@@ -20,7 +20,7 @@ proc execNimble(args: varargs[string]): tuple[output: string, exitCode: int] =
   quotedArgs.insert("-y")
   quotedArgs.insert("--nimbleDir:" & tmpNimbleDir)
   quotedArgs.insert("nimble")
-  quotedArgs = quotedArgs.map((x: string) => ("\"" & x & "\""))
+  quotedArgs = quotedArgs.map(proc (x: string): string = "\"" & x & "\"")
 
   let cmd = quotedArgs.join(" ")
   result = execCmdEx(cmd)
@@ -32,7 +32,7 @@ proc execTool(args: varargs[string]): tuple[output: string, exitCode: int] =
   quotedArgs.insert(tmpDbDir)
   quotedArgs.insert("--database")
   quotedArgs.insert(tmpNimbleDir / "bin" / "leveldb")
-  quotedArgs = quotedArgs.map((x: string) => ("\"" & x & "\""))
+  quotedArgs = quotedArgs.map(proc (x: string): string = "\"" & x & "\"")
 
   if not existsDir(tmpDbDir):
     createDir(tmpDbDir)

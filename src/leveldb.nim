@@ -1,4 +1,4 @@
-import options, strutils, leveldbpkg/raw
+import options, os, strutils, leveldbpkg/raw
 
 type
   LevelDb* = ref object
@@ -20,7 +20,15 @@ type
 
 const
   version* = block:
-    let content = staticRead"../leveldb.nimble"
+    const configFile = "leveldb.nimble"
+    const sourcePath = currentSourcePath()
+    const parentConfig = sourcePath.parentDir.parentDir / configFile
+    const localConfig = sourcePath.parentDir / configFile
+    var content: string
+    if fileExists(parentConfig):
+      content = staticRead(parentConfig)
+    else:
+      content = staticRead(localConfig)
     var version_line: string
     for line in content.split("\L"):
       if line.startsWith("version"):

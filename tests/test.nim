@@ -1,5 +1,46 @@
-import unittest, options, sequtils
+import unittest, options, os, osproc, sequtils, strutils
 import leveldb, leveldbpkg/raw
+
+const
+  tmpDir = "/tmp/testleveldb"
+  tmpNimbleDir = tmpDir / "nimble"
+  tmpDbDir = tmpDir / "testdb"
+
+template cd*(dir: string, body: untyped) =
+  ## Sets the current dir to ``dir``, executes ``body`` and restores the
+  ## previous working dir.
+  block:
+    let lastDir = getCurrentDir()
+    setCurrentDir(dir)
+    body
+    setCurrentDir(lastDir)
+
+proc execNimble(args: varargs[string]): tuple[output: string, exitCode: int] =
+  var quotedArgs = @args
+  quotedArgs.insert("-y")
+  quotedArgs.insert("--nimbleDir:" & tmpNimbleDir)
+  quotedArgs.insert("nimble")
+  quotedArgs = quotedArgs.map(proc (x: string): string = "\"" & x & "\"")
+
+  let cmd = quotedArgs.join(" ")
+  result = execCmdEx(cmd)
+  checkpoint(cmd)
+  checkpoint(result.output)
+
+proc execTool(args: varargs[string]): tuple[output: string, exitCode: int] =
+  var quotedArgs = @args
+  quotedArgs.insert(tmpDbDir)
+  quotedArgs.insert("--database")
+  quotedArgs.insert(tmpNimbleDir / "bin" / "leveldb")
+  quotedArgs = quotedArgs.map(proc (x: string): string = "\"" & x & "\"")
+
+  if not existsDir(tmpDbDir):
+    createDir(tmpDbDir)
+
+  let cmd = quotedArgs.join(" ")
+  result = execCmdEx(cmd)
+  checkpoint(cmd)
+  checkpoint(result.output)
 
 suite "leveldb":
 
@@ -159,3 +200,55 @@ suite "leveldb":
     defer: nc.close()
     nc.put("a", "1")
     check(toSeq(nc.iter()) == @[("a", "1")])
+
+suite "package":
+
+  test "import as package":
+    let (output, exitCode) = execNimble("install")
+    check exitCode == QuitSuccess
+    check output.contains("leveldb installed successfully.")
+
+    cd "tests/packagetest":
+      var (output, exitCode) = execNimble("build")
+      check exitCode == QuitSuccess
+      check output.contains("Building")
+
+      (output, exitCode) = execCmdEx("./packagetest")
+      checkpoint output
+      check exitCode == QuitSuccess
+      check output.contains("leveldb works.")
+
+suite "tool":
+
+  test "leveldb tool":
+    var (output, exitCode) = execNimble("install")
+    check exitCode == QuitSuccess
+    check output.contains("Building")
+
+    check execTool("-v").exitCode == QuitSuccess
+    check execTool("create").exitCode == QuitSuccess
+    check execTool("list").exitCode == QuitSuccess
+
+    check execTool("put", "hello", "world").exitCode == QuitSuccess
+    (output, exitCode) = execTool("get", "hello")
+    check exitCode == QuitSuccess
+    check output == "world\L"
+    (output, exitCode) = execTool("list")
+    check exitCode == QuitSuccess
+    check output == "hello world\L"
+
+    check execTool("delete", "hello").exitCode == QuitSuccess
+    (output, exitCode) = execTool("get", "hello")
+    check exitCode == QuitSuccess
+    check output == ""
+    (output, exitCode) = execTool("list")
+    check exitCode == QuitSuccess
+    check output == ""
+
+    check execTool("put", "hello", "6130", "-x").exitCode == QuitSuccess
+    check execTool("get", "hello", "-x").output == "6130\L"
+    check execTool("get", "hello").output == "a0\L"
+    check execTool("list", "-x").output == "hello 6130\L"
+    check execTool("put", "hello", "0061", "-x").exitCode == QuitSuccess
+    check execTool("get", "hello", "-x").output == "0061\L"
+    check execTool("delete", "hello").exitCode == QuitSuccess

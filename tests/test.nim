@@ -1,5 +1,5 @@
 import unittest, options, os, osproc, sequtils, strutils
-import leveldb, leveldbpkg/raw
+import leveldb, leveldb/raw
 
 const
   tmpDir = "/tmp/testleveldb"
@@ -31,7 +31,7 @@ proc execTool(args: varargs[string]): tuple[output: string, exitCode: int] =
   var quotedArgs = @args
   quotedArgs.insert(tmpDbDir)
   quotedArgs.insert("--database")
-  quotedArgs.insert(tmpNimbleDir / "bin" / "leveldb")
+  quotedArgs.insert(tmpNimbleDir / "bin" / "leveldbtool")
   quotedArgs = quotedArgs.map(proc (x: string): string = "\"" & x & "\"")
 
   if not existsDir(tmpDbDir):
@@ -203,6 +203,9 @@ suite "leveldb":
 
 suite "package":
 
+  setup:
+    removeDir(tmpDir)
+
   test "import as package":
     let (output, exitCode) = execNimble("install")
     check exitCode == QuitSuccess
@@ -219,6 +222,9 @@ suite "package":
       check output.contains("leveldb works.")
 
 suite "tool":
+
+  setup:
+    removeDir(tmpDir)
 
   test "leveldb tool":
     var (output, exitCode) = execNimble("install")

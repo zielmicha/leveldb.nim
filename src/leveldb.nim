@@ -111,7 +111,7 @@ proc open*(path: string, create = true, reuse = true, paranoidChecks = true,
   result.db = leveldb_open(options, path, addr errPtr)
   checkError(errPtr)
 
-proc put*(self: LevelDb, key: string, value: string, sync = true) =
+proc put*(self: LevelDb, key: string, value: string, sync = false) =
   assert self.db != nil
   var errPtr: cstring = nil
   let writeOptions = if sync: self.syncWriteOptions else: self.asyncWriteOptions
@@ -150,7 +150,7 @@ proc getOrDefault*(self: LevelDb, key: string, default = ""): string =
   else:
     result = val.get()
 
-proc delete*(self: LevelDb, key: string, sync = true) =
+proc delete*(self: LevelDb, key: string, sync = false) =
   var errPtr: cstring = nil
   let writeOptions = if sync: self.syncWriteOptions else: self.asyncWriteOptions
   leveldb_delete(self.db, writeOptions, key, key.len, addr errPtr)
@@ -166,7 +166,7 @@ proc newBatch*(): LevelDbWriteBatch =
   new(result, destroy)
   result.batch = leveldb_writebatch_create()
 
-proc put*(self: LevelDbWriteBatch, key: string, value: string, sync = true) =
+proc put*(self: LevelDbWriteBatch, key: string, value: string, sync = false) =
   leveldb_writebatch_put(self.batch, key, key.len.csize, value, value.len.csize)
 
 proc append*(self, source: LevelDbWriteBatch) =

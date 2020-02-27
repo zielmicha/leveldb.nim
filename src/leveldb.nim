@@ -138,6 +138,18 @@ proc get*(self: LevelDb, key: string): Option[string] =
     result = some(newString(s, size))
     free(s)
 
+proc getOrDefault*(self: LevelDb, key: string, default = ""): string =
+  runnableExamples:
+    let db = leveldb.open("/tmp/test")
+    doAssert db.getOrDefault("what?", "nothing") == "nothing"
+    db.close()
+
+  let val = self.get(key)
+  if val.isNone():
+    result = default
+  else:
+    result = val.get()
+
 proc delete*(self: LevelDb, key: string, sync = true) =
   var errPtr: cstring = nil
   let writeOptions = if sync: self.syncWriteOptions else: self.asyncWriteOptions

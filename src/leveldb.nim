@@ -5,12 +5,12 @@ type
   LevelDb* = ref object
     path*: string
     db: ptr leveldb_t
+    cache: ptr leveldb_cache_t
+    readOptions: ptr leveldb_readoptions_t
     syncWriteOptions: ptr leveldb_writeoptions_t
     asyncWriteOptions: ptr leveldb_writeoptions_t
-    readOptions: ptr leveldb_readoptions_t
-    cache: ptr leveldb_cache_t
 
-  LevelDbBatch* = ref object
+  LevelDbWriteBatch* = ref object
     batch: ptr leveldb_writebatch_t
 
   CompressionType* = enum
@@ -144,29 +144,29 @@ proc delete*(self: LevelDb, key: string, sync = true) =
   leveldb_delete(self.db, writeOptions, key, key.len, addr errPtr)
   checkError(errPtr)
 
-proc destroy*(self: LevelDbBatch) =
+proc destroy*(self: LevelDbWriteBatch) =
   if self.batch == nil:
     return
   leveldb_writebatch_destroy(self.batch)
   self.batch = nil
 
-proc newBatch*(): LevelDbBatch =
+proc newBatch*(): LevelDbWriteBatch =
   new(result, destroy)
   result.batch = leveldb_writebatch_create()
 
-proc put*(self: LevelDbBatch, key: string, value: string, sync = true) =
+proc put*(self: LevelDbWriteBatch, key: string, value: string, sync = true) =
   leveldb_writebatch_put(self.batch, key, key.len.csize, value, value.len.csize)
 
-proc append*(self, source: LevelDbBatch) =
+proc append*(self, source: LevelDbWriteBatch) =
   leveldb_writebatch_append(self.batch, source.batch)
 
-proc delete*(self: LevelDbBatch, key: string) =
+proc delete*(self: LevelDbWriteBatch, key: string) =
   leveldb_writebatch_delete(self.batch, key, key.len.csize)
 
-proc clear*(self: LevelDbBatch) =
+proc clear*(self: LevelDbWriteBatch) =
   leveldb_writebatch_clear(self.batch)
 
-proc write*(self: LevelDb, batch: LevelDbBatch) =
+proc write*(self: LevelDb, batch: LevelDbWriteBatch) =
   var errPtr: cstring = nil
   leveldb_write(self.db, self.syncWriteOptions, batch.batch, addr errPtr)
   checkError(errPtr)

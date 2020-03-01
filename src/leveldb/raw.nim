@@ -27,10 +27,10 @@
 ##   be true on entry:
 ## errptr == NULL
 ## errptr points to a malloc()ed null-terminated error message
-##        (On Windows, *errptr must have been malloc()-ed by this library.)
-##   On success, a leveldb routine leaves *errptr unchanged.
-##   On failure, leveldb frees the old value of *errptr and
-##   set *errptr to a malloc()ed error message.
+##        (On Windows, \*errptr must have been malloc()-ed by this library.)
+##   On success, a leveldb routine leaves \*errptr unchanged.
+##   On failure, leveldb frees the old value of \*errptr and
+##   set \*errptr to a malloc()ed error message.
 ##
 ##   (4) Bools have the type uint8_t (0 == false; rest == true)
 ##
@@ -66,7 +66,7 @@ proc leveldb_delete*(db: ptr leveldb_t; options: ptr leveldb_writeoptions_t;
 proc leveldb_write*(db: ptr leveldb_t; options: ptr leveldb_writeoptions_t;
                    batch: ptr leveldb_writebatch_t; errptr: ptr cstring) {.importc.}
 ##  Returns NULL if not found.  A malloc()ed array otherwise.
-##    Stores the length of the array in *vallen.
+##    Stores the length of the array in \*vallen.
 
 proc leveldb_get*(db: ptr leveldb_t; options: ptr leveldb_readoptions_t; key: cstring;
                  keylen: csize; vallen: ptr csize; errptr: ptr cstring): cstring {.importc.}

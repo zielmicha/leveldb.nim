@@ -4,3 +4,4 @@ nimcache/
 tests/packagetest/packagetest
 src/leveldb
 tests/test
+src/htmldocs/

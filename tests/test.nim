@@ -65,6 +65,9 @@ suite "leveldb":
     db.put("hello", "world")
     check(db.get("hello") == some("world"))
 
+  test "get or default":
+    check(db.getOrDefault("nothing", "yes") == "yes")
+
   test "delete":
     db.put("hello", "world")
     db.delete("hello")

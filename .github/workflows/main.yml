@@ -1,10 +1,10 @@
 name: website
 
-#on: [push]
-on:
-  push:
-    tags:
-      - 'v*.*.*'
+on: [push]  # debugging only
+#on:
+#  push:
+#    tags:
+#      - 'v*.*.*'
 
 jobs:
   publish:
@@ -39,15 +39,25 @@ jobs:
           wget http://ftp.us.debian.org/debian/pool/main/l/leveldb/libleveldb-dev_1.22-3_amd64.deb
           sudo dpkg -i *.deb
       -
-        name: Build
+        name: Build and test
         env:
           RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
         run: |
           nimble build -Y
           nimble test -Y
-          nimble doc --project --git.url:https://github.com/$GITHUB_REPOSITORY src/leveldb.nim --git.commit:$RELEASE_VERSION
+      -
+        name: Build doc
+        env:
+          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+        run: |
+          # Due to bug https://github.com/nim-lang/Nim/issues/14281, compile the documentation separately.
+          #nimble doc --project --git.url:https://github.com/$GITHUB_REPOSITORY --git.commit:$RELEASE_VERSION src/leveldb.nim
+          nimble doc --git.url:https://github.com/$GITHUB_REPOSITORY --git.commit:$RELEASE_VERSION src/leveldb.nim
+          nimble doc --git.url:https://github.com/$GITHUB_REPOSITORY --git.commit:$RELEASE_VERSION src/leveldb/raw.nim
+          find .
+
           mkdir -p ./public
-          mv src/htmldocs/* ./public/
+          mv leveldb.html raw.html nimdoc.out.css ./public/
           cd ./public/
           ln -s ./leveldb.html index.html
           cd ../

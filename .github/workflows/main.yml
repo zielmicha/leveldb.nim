@@ -1,17 +1,16 @@
 name: website
 
-on: [push]  # debugging only
-#on:
-#  push:
-#    tags:
-#      - 'v*.*.*'
+#on: [push]  # debugging only
+on:
+  push:
+    tags:
+      - 'v*.*.*'
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v1
       - name: Set output
         id: vars
@@ -38,15 +37,13 @@ jobs:
           wget http://ftp.us.debian.org/debian/pool/main/l/leveldb/libleveldb1d_1.22-3_amd64.deb
           wget http://ftp.us.debian.org/debian/pool/main/l/leveldb/libleveldb-dev_1.22-3_amd64.deb
           sudo dpkg -i *.deb
-      -
-        name: Build and test
+      - name: Build and test
         env:
           RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
         run: |
           nimble build -Y
           nimble test -Y
-      -
-        name: Build doc
+      - name: Build doc
         env:
           RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
         run: |
@@ -56,13 +53,13 @@ jobs:
           nimble doc --git.url:https://github.com/$GITHUB_REPOSITORY --git.commit:$RELEASE_VERSION src/leveldb/raw.nim
           find .
 
+          # Deploying documentation of the latest version.
           mkdir -p ./public
           mv leveldb.html raw.html nimdoc.out.css ./public/
           cd ./public/
           ln -s ./leveldb.html index.html
           cd ../
-      -
-        name: Deploy
+      - name: Deploy
         if: success()
         uses: crazy-max/ghaction-github-pages@v1.3.0
         with:

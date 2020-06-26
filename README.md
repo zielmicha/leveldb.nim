@@ -1,4 +1,7 @@
 # leveldb.nim
+
+[![docs](https://img.shields.io/badge/docs-leveldb.nim-green)](https://zielmicha.github.io/leveldb.nim/)
+
 A LevelDB wrapper for Nim in a Nim friendly way.
 
 Create a database:

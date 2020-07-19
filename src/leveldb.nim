@@ -161,16 +161,16 @@ proc open*(path: string, create = true, reuse = true, paranoidChecks = true,
   else:
     leveldb_options_set_paranoid_checks(options, levelDbFalse)
 
-  leveldb_options_set_write_buffer_size(options, writeBufferSize)
-  leveldb_options_set_block_size(options, blockSize)
+  leveldb_options_set_write_buffer_size(options, writeBufferSize.csize_t)
+  leveldb_options_set_block_size(options, blockSize.csize_t)
   leveldb_options_set_max_open_files(options, cast[cint](maxOpenFiles))
-  leveldb_options_set_max_file_size(options, maxFileSize)
+  leveldb_options_set_max_file_size(options, maxFileSize.csize_t)
   leveldb_options_set_block_restart_interval(options,
                                              cast[cint](blockRestartInterval))
   leveldb_options_set_compression(options, cast[cint](compressionType.ord))
 
   if cacheCapacity > 0:
-    let cache = leveldb_cache_create_lru(cacheCapacity)
+    let cache = leveldb_cache_create_lru(cacheCapacity.csize_t)
     leveldb_options_set_cache(options, cache)
     result.cache = cache
 
@@ -197,10 +197,10 @@ proc put*(self: LevelDb, key: string, value: string, sync = false) =
   var errPtr: cstring = nil
   let writeOptions = if sync: self.syncWriteOptions else: self.asyncWriteOptions
   leveldb_put(self.db, writeOptions,
-              key, key.len.csize, value, value.len.csize, addr errPtr)
+              key, key.len.csize_t, value, value.len.csize_t, addr errPtr)
   checkError(errPtr)
 
-proc newString(cstr: cstring, length: csize): string =
+proc newString(cstr: cstring, length: csize_t): string =
   if length > 0:
     result = newString(length)
     copyMem(unsafeAddr result[0], cstr, length)
@@ -218,9 +218,9 @@ proc get*(self: LevelDb, key: string): Option[string] =
     echo db.get("hello")
     db.close()
 
-  var size: csize
+  var size: csize_t
   var errPtr: cstring = nil
-  let s = leveldb_get(self.db, self.readOptions, key, key.len, addr size, addr errPtr)
+  let s = leveldb_get(self.db, self.readOptions, key, key.len.csize_t, addr size, addr errPtr)
   checkError(errPtr)
 
   if s == nil:
@@ -252,7 +252,7 @@ proc delete*(self: LevelDb, key: string, sync = false) =
   ## * `delete proc <#delete%2CLevelDbWriteBatch%2Cstring>`_
   var errPtr: cstring = nil
   let writeOptions = if sync: self.syncWriteOptions else: self.asyncWriteOptions
-  leveldb_delete(self.db, writeOptions, key, key.len, addr errPtr)
+  leveldb_delete(self.db, writeOptions, key, key.len.csize_t, addr errPtr)
   checkError(errPtr)
 
 proc destroy*(self: LevelDbWriteBatch) =
@@ -296,7 +296,7 @@ proc put*(self: LevelDbWriteBatch, key: string, value: string, sync = false) =
   ## See also:
   ## * `put proc <#put%2CLevelDb%2Cstring%2Cstring>`_
   ## * `newBatch proc <#newBatch>`_
-  leveldb_writebatch_put(self.batch, key, key.len.csize, value, value.len.csize)
+  leveldb_writebatch_put(self.batch, key, key.len.csize_t, value, value.len.csize_t)
 
 proc append*(self, source: LevelDbWriteBatch) =
   ## Merges the `source` batch into this batch.
@@ -313,7 +313,7 @@ proc delete*(self: LevelDbWriteBatch, key: string) =
   ## See also:
   ## * `delete proc <#delete%2CLevelDb%2Cstring>`_
   ## * `newBatch proc <#newBatch>`_
-  leveldb_writebatch_delete(self.batch, key, key.len.csize)
+  leveldb_writebatch_delete(self.batch, key, key.len.csize_t)
 
 proc clear*(self: LevelDbWriteBatch) =
   ## Clear all updates buffered in this batch.
@@ -332,7 +332,7 @@ proc write*(self: LevelDb, batch: LevelDbWriteBatch) =
   checkError(errPtr)
 
 proc getIterData(iterPtr: ptr leveldb_iterator_t): (string, string) =
-  var len: csize
+  var len: csize_t
   var str: cstring
 
   str = leveldb_iter_key(iterPtr, addr len)
@@ -355,7 +355,7 @@ iterator iter*(self: LevelDb, seek: string = "", reverse: bool = false): (
   defer: leveldb_iter_destroy(iterPtr)
 
   if seek.len > 0:
-    leveldb_iter_seek(iterPtr, seek, seek.len)
+    leveldb_iter_seek(iterPtr, seek, seek.len.csize_t)
   else:
     if reverse:
       leveldb_iter_seek_to_last(iterPtr)

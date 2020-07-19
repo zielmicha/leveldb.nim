@@ -60,16 +60,16 @@ type
 proc leveldb_open*(options: ptr leveldb_options_t; name: cstring; errptr: ptr cstring): ptr leveldb_t {.importc.}
 proc leveldb_close*(db: ptr leveldb_t) {.importc.}
 proc leveldb_put*(db: ptr leveldb_t; options: ptr leveldb_writeoptions_t; key: cstring;
-                 keylen: csize; val: cstring; vallen: csize; errptr: ptr cstring) {.importc.}
+                 keylen: csize_t; val: cstring; vallen: csize_t; errptr: ptr cstring) {.importc.}
 proc leveldb_delete*(db: ptr leveldb_t; options: ptr leveldb_writeoptions_t;
-                    key: cstring; keylen: csize; errptr: ptr cstring) {.importc.}
+                    key: cstring; keylen: csize_t; errptr: ptr cstring) {.importc.}
 proc leveldb_write*(db: ptr leveldb_t; options: ptr leveldb_writeoptions_t;
                    batch: ptr leveldb_writebatch_t; errptr: ptr cstring) {.importc.}
 ##  Returns NULL if not found.  A malloc()ed array otherwise.
 ##    Stores the length of the array in \*vallen.
 
 proc leveldb_get*(db: ptr leveldb_t; options: ptr leveldb_readoptions_t; key: cstring;
-                 keylen: csize; vallen: ptr csize; errptr: ptr cstring): cstring {.importc.}
+                 keylen: csize_t; vallen: ptr csize_t; errptr: ptr cstring): cstring {.importc.}
 proc leveldb_create_iterator*(db: ptr leveldb_t; options: ptr leveldb_readoptions_t): ptr leveldb_iterator_t {.importc.}
 proc leveldb_create_snapshot*(db: ptr leveldb_t): ptr leveldb_snapshot_t {.importc.}
 proc leveldb_release_snapshot*(db: ptr leveldb_t; snapshot: ptr leveldb_snapshot_t) {.importc.}
@@ -79,12 +79,12 @@ proc leveldb_release_snapshot*(db: ptr leveldb_t; snapshot: ptr leveldb_snapshot
 proc leveldb_property_value*(db: ptr leveldb_t; propname: cstring): cstring {.importc.}
 proc leveldb_approximate_sizes*(db: ptr leveldb_t; num_ranges: cint;
                                range_start_key: ptr cstring;
-                               range_start_key_len: ptr csize;
+                               range_start_key_len: ptr csize_t;
                                range_limit_key: ptr cstring;
-                               range_limit_key_len: ptr csize; sizes: ptr uint64) {.importc.}
+                               range_limit_key_len: ptr csize_t; sizes: ptr uint64) {.importc.}
 proc leveldb_compact_range*(db: ptr leveldb_t; start_key: cstring;
-                           start_key_len: csize; limit_key: cstring;
-                           limit_key_len: csize) {.importc.}
+                           start_key_len: csize_t; limit_key: cstring;
+                           limit_key_len: csize_t) {.importc.}
 ##  Management operations
 
 proc leveldb_destroy_db*(options: ptr leveldb_options_t; name: cstring;
@@ -97,24 +97,24 @@ proc leveldb_iter_destroy*(a1: ptr leveldb_iterator_t) {.importc.}
 proc leveldb_iter_valid*(a1: ptr leveldb_iterator_t): uint8 {.importc.}
 proc leveldb_iter_seek_to_first*(a1: ptr leveldb_iterator_t) {.importc.}
 proc leveldb_iter_seek_to_last*(a1: ptr leveldb_iterator_t) {.importc.}
-proc leveldb_iter_seek*(a1: ptr leveldb_iterator_t; k: cstring; klen: csize) {.importc.}
+proc leveldb_iter_seek*(a1: ptr leveldb_iterator_t; k: cstring; klen: csize_t) {.importc.}
 proc leveldb_iter_next*(a1: ptr leveldb_iterator_t) {.importc.}
 proc leveldb_iter_prev*(a1: ptr leveldb_iterator_t) {.importc.}
-proc leveldb_iter_key*(a1: ptr leveldb_iterator_t; klen: ptr csize): cstring {.importc.}
-proc leveldb_iter_value*(a1: ptr leveldb_iterator_t; vlen: ptr csize): cstring {.importc.}
+proc leveldb_iter_key*(a1: ptr leveldb_iterator_t; klen: ptr csize_t): cstring {.importc.}
+proc leveldb_iter_value*(a1: ptr leveldb_iterator_t; vlen: ptr csize_t): cstring {.importc.}
 proc leveldb_iter_get_error*(a1: ptr leveldb_iterator_t; errptr: ptr cstring) {.importc.}
 ##  Write batch
 
 proc leveldb_writebatch_create*(): ptr leveldb_writebatch_t {.importc.}
 proc leveldb_writebatch_destroy*(a1: ptr leveldb_writebatch_t) {.importc.}
 proc leveldb_writebatch_clear*(a1: ptr leveldb_writebatch_t) {.importc.}
-proc leveldb_writebatch_put*(a1: ptr leveldb_writebatch_t; key: cstring; klen: csize;
-                            val: cstring; vlen: csize) {.importc.}
+proc leveldb_writebatch_put*(a1: ptr leveldb_writebatch_t; key: cstring; klen: csize_t;
+                            val: cstring; vlen: csize_t) {.importc.}
 proc leveldb_writebatch_delete*(a1: ptr leveldb_writebatch_t; key: cstring;
-                               klen: csize) {.importc.}
+                               klen: csize_t) {.importc.}
 proc leveldb_writebatch_iterate*(a1: ptr leveldb_writebatch_t; state: pointer; put: proc (
-    a1: pointer; k: cstring; klen: csize; v: cstring; vlen: csize); deleted: proc (
-    a1: pointer; k: cstring; klen: csize)) {.importc.}
+    a1: pointer; k: cstring; klen: csize_t; v: cstring; vlen: csize_t); deleted: proc (
+    a1: pointer; k: cstring; klen: csize_t)) {.importc.}
 proc leveldb_writebatch_append*(destination: ptr leveldb_writebatch_t;
                                source: ptr leveldb_writebatch_t) {.importc.}
 ##  Options
@@ -131,12 +131,12 @@ proc leveldb_options_set_paranoid_checks*(a1: ptr leveldb_options_t; a2: uint8) 
 proc leveldb_options_set_env*(a1: ptr leveldb_options_t; a2: ptr leveldb_env_t) {.importc.}
 proc leveldb_options_set_info_log*(a1: ptr leveldb_options_t;
                                   a2: ptr leveldb_logger_t) {.importc.}
-proc leveldb_options_set_write_buffer_size*(a1: ptr leveldb_options_t; a2: csize) {.importc.}
+proc leveldb_options_set_write_buffer_size*(a1: ptr leveldb_options_t; a2: csize_t) {.importc.}
 proc leveldb_options_set_max_open_files*(a1: ptr leveldb_options_t; a2: cint) {.importc.}
 proc leveldb_options_set_cache*(a1: ptr leveldb_options_t; a2: ptr leveldb_cache_t) {.importc.}
-proc leveldb_options_set_block_size*(a1: ptr leveldb_options_t; a2: csize) {.importc.}
+proc leveldb_options_set_block_size*(a1: ptr leveldb_options_t; a2: csize_t) {.importc.}
 proc leveldb_options_set_block_restart_interval*(a1: ptr leveldb_options_t; a2: cint) {.importc.}
-proc leveldb_options_set_max_file_size*(a1: ptr leveldb_options_t; a2: csize) {.importc.}
+proc leveldb_options_set_max_file_size*(a1: ptr leveldb_options_t; a2: csize_t) {.importc.}
 const
   leveldb_no_compression* = 0
   leveldb_snappy_compression* = 1
@@ -145,16 +145,16 @@ proc leveldb_options_set_compression*(a1: ptr leveldb_options_t; a2: cint) {.imp
 ##  Comparator
 
 proc leveldb_comparator_create*(state: pointer; destructor: proc (a1: pointer); compare: proc (
-    a1: pointer; a: cstring; alen: csize; b: cstring; blen: csize): cint;
+    a1: pointer; a: cstring; alen: csize_t; b: cstring; blen: csize_t): cint;
                                name: proc (a1: pointer): cstring): ptr leveldb_comparator_t {.importc.}
 proc leveldb_comparator_destroy*(a1: ptr leveldb_comparator_t) {.importc.}
 ##  Filter policy
 
 proc leveldb_filterpolicy_create*(state: pointer; destructor: proc (a1: pointer);
     create_filter: proc (a1: pointer; key_array: ptr cstring;
-                       key_length_array: ptr csize; num_keys: cint;
-                       filter_length: ptr csize): cstring; key_may_match: proc (
-    a1: pointer; key: cstring; length: csize; filter: cstring; filter_length: csize): uint8;
+                       key_length_array: ptr csize_t; num_keys: cint;
+                       filter_length: ptr csize_t): cstring; key_may_match: proc (
+    a1: pointer; key: cstring; length: csize_t; filter: cstring; filter_length: csize_t): uint8;
                                  name: proc (a1: pointer): cstring): ptr leveldb_filterpolicy_t {.importc.}
 proc leveldb_filterpolicy_destroy*(a1: ptr leveldb_filterpolicy_t) {.importc.}
 proc leveldb_filterpolicy_create_bloom*(bits_per_key: cint): ptr leveldb_filterpolicy_t {.importc.}
@@ -174,7 +174,7 @@ proc leveldb_writeoptions_destroy*(a1: ptr leveldb_writeoptions_t) {.importc.}
 proc leveldb_writeoptions_set_sync*(a1: ptr leveldb_writeoptions_t; a2: uint8) {.importc.}
 ##  Cache
 
-proc leveldb_cache_create_lru*(capacity: csize): ptr leveldb_cache_t {.importc.}
+proc leveldb_cache_create_lru*(capacity: csize_t): ptr leveldb_cache_t {.importc.}
 proc leveldb_cache_destroy*(cache: ptr leveldb_cache_t) {.importc.}
 ##  Env
 

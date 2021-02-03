@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.3.0"
+version       = "0.4.0"
 author        = "Michał Zieliński"
 description   = "LevelDB wrapper for Nim"
 license       = "MIT"
@@ -10,4 +10,4 @@ bin           = @["leveldbtool"]
 
 # Dependencies
 
-requires "nim >= 0.18.0"
+requires "nim >= 1.4.0"

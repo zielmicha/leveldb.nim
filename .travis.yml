@@ -19,11 +19,7 @@ matrix:
     - os: linux
       env: CHANNEL=stable
     - os: linux
-      env: CHANNEL=0.20.2
-    - os: linux
-      env: CHANNEL=0.19.6
-    - os: linux
-      env: CHANNEL=0.18.0
+      env: CHANNEL=1.4.0
 
 install:
   - |

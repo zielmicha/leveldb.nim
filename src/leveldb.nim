@@ -74,7 +74,7 @@ type
     ctNoCompression = leveldb_no_compression,
     ctSnappyCompression = leveldb_snappy_compression
 
-  LevelDbException* = object of Exception
+  LevelDbException* = object of CatchableError
 
 const
   version* = block:

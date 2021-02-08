@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.4.0"
+version       = "0.4.1"
 author        = "Michał Zieliński"
 description   = "LevelDB wrapper for Nim"
 license       = "MIT"

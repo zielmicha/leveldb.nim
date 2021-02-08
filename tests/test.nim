@@ -34,7 +34,7 @@ proc execTool(args: varargs[string]): tuple[output: string, exitCode: int] =
   quotedArgs.insert(tmpNimbleDir / "bin" / "leveldbtool")
   quotedArgs = quotedArgs.map(proc (x: string): string = "\"" & x & "\"")
 
-  if not existsDir(tmpDbDir):
+  if not dirExists(tmpDbDir):
     createDir(tmpDbDir)
 
   let cmd = quotedArgs.join(" ")

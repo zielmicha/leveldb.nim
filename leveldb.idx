@@ -1,0 +1,26 @@
+LevelDb	leveldb.html#LevelDb	leveldb: LevelDb	
+LevelDbWriteBatch	leveldb.html#LevelDbWriteBatch	leveldb: LevelDbWriteBatch	
+ctNoCompression	leveldb.html#ctNoCompression	CompressionType.ctNoCompression	
+ctSnappyCompression	leveldb.html#ctSnappyCompression	CompressionType.ctSnappyCompression	
+CompressionType	leveldb.html#CompressionType	leveldb: CompressionType	
+LevelDbException	leveldb.html#LevelDbException	leveldb: LevelDbException	
+version	leveldb.html#version	leveldb: version	
+getLibVersion	leveldb.html#getLibVersion	leveldb: getLibVersion(): (int, int)	
+close	leveldb.html#close,LevelDb	leveldb: close(self: LevelDb)	
+open	leveldb.html#open,string,int,int,int	leveldb: open(path: string; create = true; reuse = true; paranoidChecks = true;\n     compressionType = ctSnappyCompression; cacheCapacity = 0;\n     blockSize = 4 * 1024; writeBufferSize = 4096 * 1024; maxOpenFiles = 1000;\n     maxFileSize = 2048 * 1024; blockRestartInterval = 16): LevelDb	
+put	leveldb.html#put,LevelDb,string,string	leveldb: put(self: LevelDb; key: string; value: string; sync = false)	
+get	leveldb.html#get,LevelDb,string	leveldb: get(self: LevelDb; key: string): Option[string]	
+getOrDefault	leveldb.html#getOrDefault,LevelDb,string,string	leveldb: getOrDefault(self: LevelDb; key: string; default = &quot;&quot;): string	
+delete	leveldb.html#delete,LevelDb,string	leveldb: delete(self: LevelDb; key: string; sync = false)	
+destroy	leveldb.html#destroy,LevelDbWriteBatch	leveldb: destroy(self: LevelDbWriteBatch)	
+newBatch	leveldb.html#newBatch	leveldb: newBatch(): LevelDbWriteBatch	
+put	leveldb.html#put,LevelDbWriteBatch,string,string	leveldb: put(self: LevelDbWriteBatch; key: string; value: string; sync = false)	
+append	leveldb.html#append,LevelDbWriteBatch,LevelDbWriteBatch	leveldb: append(self, source: LevelDbWriteBatch)	
+delete	leveldb.html#delete,LevelDbWriteBatch,string	leveldb: delete(self: LevelDbWriteBatch; key: string)	
+clear	leveldb.html#clear,LevelDbWriteBatch	leveldb: clear(self: LevelDbWriteBatch)	
+write	leveldb.html#write,LevelDb,LevelDbWriteBatch	leveldb: write(self: LevelDb; batch: LevelDbWriteBatch)	
+iter	leveldb.html#iter.i,LevelDb,string,bool	leveldb: iter(self: LevelDb; seek: string = &quot;&quot;; reverse: bool = false): (string, string)	
+iterPrefix	leveldb.html#iterPrefix.i,LevelDb,string	leveldb: iterPrefix(self: LevelDb; prefix: string): (string, string)	
+iterRange	leveldb.html#iterRange.i,LevelDb,string,string	leveldb: iterRange(self: LevelDb; start, limit: string): (string, string)	
+removeDb	leveldb.html#removeDb,string	leveldb: removeDb(name: string)	
+repairDb	leveldb.html#repairDb,string	leveldb: repairDb(name: string)	

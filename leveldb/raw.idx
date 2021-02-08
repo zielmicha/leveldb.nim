@@ -1,0 +1,83 @@
+Exported types	leveldb/raw.html#exported-types	 Exported types	
+leveldb_options_t	leveldb/raw.html#leveldb_options_t	raw: leveldb_options_t	
+leveldb_writeoptions_t	leveldb/raw.html#leveldb_writeoptions_t	raw: leveldb_writeoptions_t	
+leveldb_readoptions_t	leveldb/raw.html#leveldb_readoptions_t	raw: leveldb_readoptions_t	
+leveldb_writebatch_t	leveldb/raw.html#leveldb_writebatch_t	raw: leveldb_writebatch_t	
+leveldb_iterator_t	leveldb/raw.html#leveldb_iterator_t	raw: leveldb_iterator_t	
+leveldb_snapshot_t	leveldb/raw.html#leveldb_snapshot_t	raw: leveldb_snapshot_t	
+leveldb_comparator_t	leveldb/raw.html#leveldb_comparator_t	raw: leveldb_comparator_t	
+leveldb_filterpolicy_t	leveldb/raw.html#leveldb_filterpolicy_t	raw: leveldb_filterpolicy_t	
+leveldb_env_t	leveldb/raw.html#leveldb_env_t	raw: leveldb_env_t	
+leveldb_logger_t	leveldb/raw.html#leveldb_logger_t	raw: leveldb_logger_t	
+leveldb_cache_t	leveldb/raw.html#leveldb_cache_t	raw: leveldb_cache_t	
+leveldb_t	leveldb/raw.html#leveldb_t	raw: leveldb_t	
+leveldb_open	leveldb/raw.html#leveldb_open,ptr.leveldb_options_t,cstring,ptr.cstring	raw: leveldb_open(options: ptr leveldb_options_t; name: cstring; errptr: ptr cstring): ptr leveldb_t	
+leveldb_close	leveldb/raw.html#leveldb_close,ptr.leveldb_t	raw: leveldb_close(db: ptr leveldb_t)	
+leveldb_put	leveldb/raw.html#leveldb_put,ptr.leveldb_t,ptr.leveldb_writeoptions_t,cstring,csize_t,cstring,csize_t,ptr.cstring	raw: leveldb_put(db: ptr leveldb_t; options: ptr leveldb_writeoptions_t;\n            key: cstring; keylen: csize_t; val: cstring; vallen: csize_t;\n            errptr: ptr cstring)	
+leveldb_delete	leveldb/raw.html#leveldb_delete,ptr.leveldb_t,ptr.leveldb_writeoptions_t,cstring,csize_t,ptr.cstring	raw: leveldb_delete(db: ptr leveldb_t; options: ptr leveldb_writeoptions_t;\n               key: cstring; keylen: csize_t; errptr: ptr cstring)	
+leveldb_write	leveldb/raw.html#leveldb_write,ptr.leveldb_t,ptr.leveldb_writeoptions_t,ptr.leveldb_writebatch_t,ptr.cstring	raw: leveldb_write(db: ptr leveldb_t; options: ptr leveldb_writeoptions_t;\n              batch: ptr leveldb_writebatch_t; errptr: ptr cstring)	
+leveldb_get	leveldb/raw.html#leveldb_get,ptr.leveldb_t,ptr.leveldb_readoptions_t,cstring,csize_t,ptr.csize_t,ptr.cstring	raw: leveldb_get(db: ptr leveldb_t; options: ptr leveldb_readoptions_t; key: cstring;\n            keylen: csize_t; vallen: ptr csize_t; errptr: ptr cstring): cstring	
+leveldb_create_iterator	leveldb/raw.html#leveldb_create_iterator,ptr.leveldb_t,ptr.leveldb_readoptions_t	raw: leveldb_create_iterator(db: ptr leveldb_t; options: ptr leveldb_readoptions_t): ptr leveldb_iterator_t	
+leveldb_create_snapshot	leveldb/raw.html#leveldb_create_snapshot,ptr.leveldb_t	raw: leveldb_create_snapshot(db: ptr leveldb_t): ptr leveldb_snapshot_t	
+leveldb_release_snapshot	leveldb/raw.html#leveldb_release_snapshot,ptr.leveldb_t,ptr.leveldb_snapshot_t	raw: leveldb_release_snapshot(db: ptr leveldb_t; snapshot: ptr leveldb_snapshot_t)	
+leveldb_property_value	leveldb/raw.html#leveldb_property_value,ptr.leveldb_t,cstring	raw: leveldb_property_value(db: ptr leveldb_t; propname: cstring): cstring	
+leveldb_approximate_sizes	leveldb/raw.html#leveldb_approximate_sizes,ptr.leveldb_t,cint,ptr.cstring,ptr.csize_t,ptr.cstring,ptr.csize_t,ptr.uint64	raw: leveldb_approximate_sizes(db: ptr leveldb_t; num_ranges: cint;\n                          range_start_key: ptr cstring;\n                          range_start_key_len: ptr csize_t;\n                          range_limit_key: ptr cstring;\n                          range_limit_key_len: ptr csize_t; sizes: ptr uint64)	
+leveldb_compact_range	leveldb/raw.html#leveldb_compact_range,ptr.leveldb_t,cstring,csize_t,cstring,csize_t	raw: leveldb_compact_range(db: ptr leveldb_t; start_key: cstring;\n                      start_key_len: csize_t; limit_key: cstring;\n                      limit_key_len: csize_t)	
+leveldb_destroy_db	leveldb/raw.html#leveldb_destroy_db,ptr.leveldb_options_t,cstring,ptr.cstring	raw: leveldb_destroy_db(options: ptr leveldb_options_t; name: cstring;\n                   errptr: ptr cstring)	
+leveldb_repair_db	leveldb/raw.html#leveldb_repair_db,ptr.leveldb_options_t,cstring,ptr.cstring	raw: leveldb_repair_db(options: ptr leveldb_options_t; name: cstring;\n                  errptr: ptr cstring)	
+leveldb_iter_destroy	leveldb/raw.html#leveldb_iter_destroy,ptr.leveldb_iterator_t	raw: leveldb_iter_destroy(a1: ptr leveldb_iterator_t)	
+leveldb_iter_valid	leveldb/raw.html#leveldb_iter_valid,ptr.leveldb_iterator_t	raw: leveldb_iter_valid(a1: ptr leveldb_iterator_t): uint8	
+leveldb_iter_seek_to_first	leveldb/raw.html#leveldb_iter_seek_to_first,ptr.leveldb_iterator_t	raw: leveldb_iter_seek_to_first(a1: ptr leveldb_iterator_t)	
+leveldb_iter_seek_to_last	leveldb/raw.html#leveldb_iter_seek_to_last,ptr.leveldb_iterator_t	raw: leveldb_iter_seek_to_last(a1: ptr leveldb_iterator_t)	
+leveldb_iter_seek	leveldb/raw.html#leveldb_iter_seek,ptr.leveldb_iterator_t,cstring,csize_t	raw: leveldb_iter_seek(a1: ptr leveldb_iterator_t; k: cstring; klen: csize_t)	
+leveldb_iter_next	leveldb/raw.html#leveldb_iter_next,ptr.leveldb_iterator_t	raw: leveldb_iter_next(a1: ptr leveldb_iterator_t)	
+leveldb_iter_prev	leveldb/raw.html#leveldb_iter_prev,ptr.leveldb_iterator_t	raw: leveldb_iter_prev(a1: ptr leveldb_iterator_t)	
+leveldb_iter_key	leveldb/raw.html#leveldb_iter_key,ptr.leveldb_iterator_t,ptr.csize_t	raw: leveldb_iter_key(a1: ptr leveldb_iterator_t; klen: ptr csize_t): cstring	
+leveldb_iter_value	leveldb/raw.html#leveldb_iter_value,ptr.leveldb_iterator_t,ptr.csize_t	raw: leveldb_iter_value(a1: ptr leveldb_iterator_t; vlen: ptr csize_t): cstring	
+leveldb_iter_get_error	leveldb/raw.html#leveldb_iter_get_error,ptr.leveldb_iterator_t,ptr.cstring	raw: leveldb_iter_get_error(a1: ptr leveldb_iterator_t; errptr: ptr cstring)	
+leveldb_writebatch_create	leveldb/raw.html#leveldb_writebatch_create	raw: leveldb_writebatch_create(): ptr leveldb_writebatch_t	
+leveldb_writebatch_destroy	leveldb/raw.html#leveldb_writebatch_destroy,ptr.leveldb_writebatch_t	raw: leveldb_writebatch_destroy(a1: ptr leveldb_writebatch_t)	
+leveldb_writebatch_clear	leveldb/raw.html#leveldb_writebatch_clear,ptr.leveldb_writebatch_t	raw: leveldb_writebatch_clear(a1: ptr leveldb_writebatch_t)	
+leveldb_writebatch_put	leveldb/raw.html#leveldb_writebatch_put,ptr.leveldb_writebatch_t,cstring,csize_t,cstring,csize_t	raw: leveldb_writebatch_put(a1: ptr leveldb_writebatch_t; key: cstring;\n                       klen: csize_t; val: cstring; vlen: csize_t)	
+leveldb_writebatch_delete	leveldb/raw.html#leveldb_writebatch_delete,ptr.leveldb_writebatch_t,cstring,csize_t	raw: leveldb_writebatch_delete(a1: ptr leveldb_writebatch_t; key: cstring;\n                          klen: csize_t)	
+leveldb_writebatch_iterate	leveldb/raw.html#leveldb_writebatch_iterate,ptr.leveldb_writebatch_t,pointer,proc(pointer,cstring,csize_t,cstring,csize_t),proc(pointer,cstring,csize_t)	raw: leveldb_writebatch_iterate(a1: ptr leveldb_writebatch_t; state: pointer; put: proc (\n    a1: pointer; k: cstring; klen: csize_t; v: cstring; vlen: csize_t); deleted: proc (\n    a1: pointer; k: cstring; klen: csize_t))	
+leveldb_writebatch_append	leveldb/raw.html#leveldb_writebatch_append,ptr.leveldb_writebatch_t,ptr.leveldb_writebatch_t	raw: leveldb_writebatch_append(destination: ptr leveldb_writebatch_t;\n                          source: ptr leveldb_writebatch_t)	
+leveldb_options_create	leveldb/raw.html#leveldb_options_create	raw: leveldb_options_create(): ptr leveldb_options_t	
+leveldb_options_destroy	leveldb/raw.html#leveldb_options_destroy,ptr.leveldb_options_t	raw: leveldb_options_destroy(a1: ptr leveldb_options_t)	
+leveldb_options_set_comparator	leveldb/raw.html#leveldb_options_set_comparator,ptr.leveldb_options_t,ptr.leveldb_comparator_t	raw: leveldb_options_set_comparator(a1: ptr leveldb_options_t;\n                               a2: ptr leveldb_comparator_t)	
+leveldb_options_set_filter_policy	leveldb/raw.html#leveldb_options_set_filter_policy,ptr.leveldb_options_t,ptr.leveldb_filterpolicy_t	raw: leveldb_options_set_filter_policy(a1: ptr leveldb_options_t;\n                                  a2: ptr leveldb_filterpolicy_t)	
+leveldb_options_set_create_if_missing	leveldb/raw.html#leveldb_options_set_create_if_missing,ptr.leveldb_options_t,uint8	raw: leveldb_options_set_create_if_missing(a1: ptr leveldb_options_t; a2: uint8)	
+leveldb_options_set_error_if_exists	leveldb/raw.html#leveldb_options_set_error_if_exists,ptr.leveldb_options_t,uint8	raw: leveldb_options_set_error_if_exists(a1: ptr leveldb_options_t; a2: uint8)	
+leveldb_options_set_paranoid_checks	leveldb/raw.html#leveldb_options_set_paranoid_checks,ptr.leveldb_options_t,uint8	raw: leveldb_options_set_paranoid_checks(a1: ptr leveldb_options_t; a2: uint8)	
+leveldb_options_set_env	leveldb/raw.html#leveldb_options_set_env,ptr.leveldb_options_t,ptr.leveldb_env_t	raw: leveldb_options_set_env(a1: ptr leveldb_options_t; a2: ptr leveldb_env_t)	
+leveldb_options_set_info_log	leveldb/raw.html#leveldb_options_set_info_log,ptr.leveldb_options_t,ptr.leveldb_logger_t	raw: leveldb_options_set_info_log(a1: ptr leveldb_options_t; a2: ptr leveldb_logger_t)	
+leveldb_options_set_write_buffer_size	leveldb/raw.html#leveldb_options_set_write_buffer_size,ptr.leveldb_options_t,csize_t	raw: leveldb_options_set_write_buffer_size(a1: ptr leveldb_options_t; a2: csize_t)	
+leveldb_options_set_max_open_files	leveldb/raw.html#leveldb_options_set_max_open_files,ptr.leveldb_options_t,cint	raw: leveldb_options_set_max_open_files(a1: ptr leveldb_options_t; a2: cint)	
+leveldb_options_set_cache	leveldb/raw.html#leveldb_options_set_cache,ptr.leveldb_options_t,ptr.leveldb_cache_t	raw: leveldb_options_set_cache(a1: ptr leveldb_options_t; a2: ptr leveldb_cache_t)	
+leveldb_options_set_block_size	leveldb/raw.html#leveldb_options_set_block_size,ptr.leveldb_options_t,csize_t	raw: leveldb_options_set_block_size(a1: ptr leveldb_options_t; a2: csize_t)	
+leveldb_options_set_block_restart_interval	leveldb/raw.html#leveldb_options_set_block_restart_interval,ptr.leveldb_options_t,cint	raw: leveldb_options_set_block_restart_interval(a1: ptr leveldb_options_t; a2: cint)	
+leveldb_options_set_max_file_size	leveldb/raw.html#leveldb_options_set_max_file_size,ptr.leveldb_options_t,csize_t	raw: leveldb_options_set_max_file_size(a1: ptr leveldb_options_t; a2: csize_t)	
+leveldb_no_compression	leveldb/raw.html#leveldb_no_compression	raw: leveldb_no_compression	
+leveldb_snappy_compression	leveldb/raw.html#leveldb_snappy_compression	raw: leveldb_snappy_compression	
+leveldb_options_set_compression	leveldb/raw.html#leveldb_options_set_compression,ptr.leveldb_options_t,cint	raw: leveldb_options_set_compression(a1: ptr leveldb_options_t; a2: cint)	
+leveldb_comparator_create	leveldb/raw.html#leveldb_comparator_create,pointer,proc(pointer),proc(pointer,cstring,csize_t,cstring,csize_t),proc(pointer)	raw: leveldb_comparator_create(state: pointer; destructor: proc (a1: pointer);\n    compare: proc (a1: pointer; a: cstring; alen: csize_t; b: cstring;\n                   blen: csize_t): cint; name: proc (a1: pointer): cstring): ptr leveldb_comparator_t	
+leveldb_comparator_destroy	leveldb/raw.html#leveldb_comparator_destroy,ptr.leveldb_comparator_t	raw: leveldb_comparator_destroy(a1: ptr leveldb_comparator_t)	
+leveldb_filterpolicy_create	leveldb/raw.html#leveldb_filterpolicy_create,pointer,proc(pointer),proc(pointer,ptr.cstring,ptr.csize_t,cint,ptr.csize_t),proc(pointer,cstring,csize_t,cstring,csize_t),proc(pointer)	raw: leveldb_filterpolicy_create(state: pointer; destructor: proc (a1: pointer);\n    create_filter: proc (a1: pointer; key_array: ptr cstring;\n                         key_length_array: ptr csize_t; num_keys: cint;\n                         filter_length: ptr csize_t): cstring; key_may_match: proc (\n    a1: pointer; key: cstring; length: csize_t; filter: cstring;\n    filter_length: csize_t): uint8; name: proc (a1: pointer): cstring): ptr leveldb_filterpolicy_t	
+leveldb_filterpolicy_destroy	leveldb/raw.html#leveldb_filterpolicy_destroy,ptr.leveldb_filterpolicy_t	raw: leveldb_filterpolicy_destroy(a1: ptr leveldb_filterpolicy_t)	
+leveldb_filterpolicy_create_bloom	leveldb/raw.html#leveldb_filterpolicy_create_bloom,cint	raw: leveldb_filterpolicy_create_bloom(bits_per_key: cint): ptr leveldb_filterpolicy_t	
+leveldb_readoptions_create	leveldb/raw.html#leveldb_readoptions_create	raw: leveldb_readoptions_create(): ptr leveldb_readoptions_t	
+leveldb_readoptions_destroy	leveldb/raw.html#leveldb_readoptions_destroy,ptr.leveldb_readoptions_t	raw: leveldb_readoptions_destroy(a1: ptr leveldb_readoptions_t)	
+leveldb_readoptions_set_verify_checksums	leveldb/raw.html#leveldb_readoptions_set_verify_checksums,ptr.leveldb_readoptions_t,uint8	raw: leveldb_readoptions_set_verify_checksums(a1: ptr leveldb_readoptions_t;\n    a2: uint8)	
+leveldb_readoptions_set_fill_cache	leveldb/raw.html#leveldb_readoptions_set_fill_cache,ptr.leveldb_readoptions_t,uint8	raw: leveldb_readoptions_set_fill_cache(a1: ptr leveldb_readoptions_t; a2: uint8)	
+leveldb_readoptions_set_snapshot	leveldb/raw.html#leveldb_readoptions_set_snapshot,ptr.leveldb_readoptions_t,ptr.leveldb_snapshot_t	raw: leveldb_readoptions_set_snapshot(a1: ptr leveldb_readoptions_t;\n                                 a2: ptr leveldb_snapshot_t)	
+leveldb_writeoptions_create	leveldb/raw.html#leveldb_writeoptions_create	raw: leveldb_writeoptions_create(): ptr leveldb_writeoptions_t	
+leveldb_writeoptions_destroy	leveldb/raw.html#leveldb_writeoptions_destroy,ptr.leveldb_writeoptions_t	raw: leveldb_writeoptions_destroy(a1: ptr leveldb_writeoptions_t)	
+leveldb_writeoptions_set_sync	leveldb/raw.html#leveldb_writeoptions_set_sync,ptr.leveldb_writeoptions_t,uint8	raw: leveldb_writeoptions_set_sync(a1: ptr leveldb_writeoptions_t; a2: uint8)	
+leveldb_cache_create_lru	leveldb/raw.html#leveldb_cache_create_lru,csize_t	raw: leveldb_cache_create_lru(capacity: csize_t): ptr leveldb_cache_t	
+leveldb_cache_destroy	leveldb/raw.html#leveldb_cache_destroy,ptr.leveldb_cache_t	raw: leveldb_cache_destroy(cache: ptr leveldb_cache_t)	
+leveldb_create_default_env	leveldb/raw.html#leveldb_create_default_env	raw: leveldb_create_default_env(): ptr leveldb_env_t	
+leveldb_env_destroy	leveldb/raw.html#leveldb_env_destroy,ptr.leveldb_env_t	raw: leveldb_env_destroy(a1: ptr leveldb_env_t)	
+leveldb_env_get_test_directory	leveldb/raw.html#leveldb_env_get_test_directory,ptr.leveldb_env_t	raw: leveldb_env_get_test_directory(a1: ptr leveldb_env_t): cstring	
+leveldb_free	leveldb/raw.html#leveldb_free,pointer	raw: leveldb_free(ptr: pointer)	
+leveldb_major_version	leveldb/raw.html#leveldb_major_version	raw: leveldb_major_version(): cint	
+leveldb_minor_version	leveldb/raw.html#leveldb_minor_version	raw: leveldb_minor_version(): cint	
